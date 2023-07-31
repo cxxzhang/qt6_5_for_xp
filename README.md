@@ -15,10 +15,3 @@ Modify from [Mile.Qt](https://github.com/ProjectMile/Mile.Qt)
 ## Documents
 
 - [License](License.md)
-
-## Credits
-
-Note: This list sort in alphabetical order.
-
-- Kenji Mouri, https://github.com/MouriNaruto
-- Yuhang Zhao, https://github.com/wangwenx190
