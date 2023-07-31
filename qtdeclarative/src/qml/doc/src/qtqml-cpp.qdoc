@@ -1,0 +1,13 @@
+// Copyright (C) 2017 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
+/*!
+\module QtQml
+\title Qt QML C++ Classes
+\ingroup modules
+\qtcmakepackage Qml
+\qtvariable qml
+\brief The C++ API provided by the Qt QML module.
+
+For more information on the Qt QML module, see the
+\l{Qt QML} module documentation.
+*/

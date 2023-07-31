@@ -1,0 +1,13 @@
+include(../configs/config.qdocconf)
+project = CrossModule
+includepaths += -I.
+
+depends = testcpp
+
+headers = testtype.h
+sources = testtype.cpp
+
+HTML.nosubdirs    = true
+HTML.outputsubdir = crossmodule
+
+defines += test_crossmodule

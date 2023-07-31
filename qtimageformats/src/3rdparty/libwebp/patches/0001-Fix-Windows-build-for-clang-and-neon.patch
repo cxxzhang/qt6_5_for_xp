@@ -1,0 +1,38 @@
+diff --git a/src/3rdparty/libwebp/src/dsp/cpu.h b/src/3rdparty/libwebp/src/dsp/cpu.h
+index 57a40d8..8cf3e92 100644
+--- a/src/3rdparty/libwebp/src/dsp/cpu.h
++++ b/src/3rdparty/libwebp/src/dsp/cpu.h
+@@ -14,6 +14,8 @@
+ #ifndef WEBP_DSP_CPU_H_
+ #define WEBP_DSP_CPU_H_
+ 
++#include <qglobal.h>
++
+ #ifdef HAVE_CONFIG_H
+ #include "src/webp/config.h"
+ #endif
+@@ -43,12 +45,12 @@
+ 
+ #if !defined(HAVE_CONFIG_H)
+ #if defined(_MSC_VER) && _MSC_VER > 1310 && \
+-    (defined(_M_X64) || defined(_M_IX86))
++    (defined(_M_X64) || defined(_M_IX86)) && !defined(__clang__)
+ #define WEBP_MSC_SSE2  // Visual C++ SSE2 targets
+ #endif
+ 
+ #if defined(_MSC_VER) && _MSC_VER >= 1500 && \
+-    (defined(_M_X64) || defined(_M_IX86))
++    (defined(_M_X64) || defined(_M_IX86)) && !defined(__clang__)
+ #define WEBP_MSC_SSE41  // Visual C++ SSE4.1 targets
+ #endif
+ #endif
+@@ -97,7 +99,8 @@
+ // arm_neon.h. Compile errors were seen with Visual Studio 2019 16.4 with
+ // vtbl4_u8(); a fix was made in 16.6.
+ #if defined(_MSC_VER) && ((_MSC_VER >= 1700 && defined(_M_ARM)) || \
+-                          (_MSC_VER >= 1926 && defined(_M_ARM64)))
++                          (_MSC_VER >= 1926 && defined(_M_ARM64))) && \
++                         !defined(__clang__) && (QT_CONFIG_neon == 1)
+ #define WEBP_USE_NEON
+ #define WEBP_USE_INTRINSICS
+ #endif

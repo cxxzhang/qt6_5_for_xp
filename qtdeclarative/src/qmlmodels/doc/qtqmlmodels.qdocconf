@@ -1,0 +1,39 @@
+include($QT_INSTALL_DOCS/global/qt-module-defaults.qdocconf)
+include($QT_INSTALL_DOCS/config/exampleurl-qtdeclarative.qdocconf)
+
+project                 = QtQmlModels
+description             = Qt Qml Models Reference Documentation
+version                 = $QT_VERSION
+moduleheader            = QtQmlModels
+qhp.projects            = QtQmlModels
+
+qhp.QtQmlModels.file                = qtqmlmodels.qhp
+qhp.QtQmlModels.namespace           = org.qt-project.qtqmlmodels.$QT_VERSION_TAG
+qhp.QtQmlModels.virtualFolder       = qtqmlmodels
+qhp.QtQmlModels.indexRoot           =
+
+qhp.QtQmlModels.title      = QML Types
+qhp.QtQmlModels.indexTitle = Qt QML Models QML Types
+qhp.QtQmlModels.selectors  = qmlclass
+qhp.QtQmlModels.sortPages  = true
+
+tagfile      = qtqmlmodels.tags
+
+depends += qtcore qtqml qtquick qtdoc qtqmlworkerscript qtquickcontrols
+
+{headerdirs,sourcedirs} += \
+    .. \
+    ../../labs/models
+
+exampledirs += .. \
+               snippets
+
+imagedirs += images
+
+navigation.qmltypespage = "Qt Qml Models QML Types"
+
+# suppress qdoc warnings for \instantiates entries
+spurious += "C\\+\\+ class .*\\\\instantiates .*"
+
+# Fail the documentation build if there are more warnings than the limit
+warninglimit = 0

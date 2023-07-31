@@ -1,0 +1,216 @@
+// Copyright (C) 2017 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
+
+/*!
+\qmlmodule QtQml
+\title Qt QML QML Types
+\ingroup qmlmodules
+\brief List of QML types provided by the Qt QML module
+
+The \l{Qt QML} module provides the definition and implementation of various
+convenience types which can be used with the QML language, including some
+elementary QML types which can provide the basis for further extensions to the
+QML language. The \l QtObject and \l Component object types are non-visual and
+provide building-blocks for extensions to QML.
+
+\section1 Importing QtQml
+
+The types provided by the \c QtQml module are only available in a QML document
+if that document imports the \c QtQml namespace (or if the document imports the
+\c QtQuick namespace, as noted below).
+
+To use the module, import the \c QtQml module with the following statement:
+
+\qml
+import QtQml
+\endqml
+
+Most clients will never need to use the \c QtQml import, as all of the types
+are also provided by the \c QtQuick namespace which may be imported as
+follows:
+
+\qml
+import QtQuick
+\endqml
+
+See the \l{Qt Quick} module documentation for more information about the \c
+QtQuick namespace and what it provides to QML application developers.
+
+The QML types for creating lists and models, such as \l ListModel and \l
+ListElement, are moved to a submodule, \c QtQml.Models. The \l{Qt QML Models QML
+Types}{Qt QML Models} page has more information.
+
+
+The documentation for the types below applies equally to the types of the same
+name provided by the \l{Qt Quick} module, as they are in fact identical.
+
+\section1 Value Types
+
+The following \l{qtqml-typesystem-valuetypes.html}{QML Value Types} are
+provided:
+
+\annotatedlist qtqmlvaluetypes
+
+\section1 Object Types
+
+The following \l{qtqml-typesystem-objecttypes.html}{QML object types} are
+provided:
+
+*/
+
+/*!
+\qmlvaluetype date
+\ingroup qmlvaluetypes
+\brief a date value.
+
+The \c date type refers to a date value, including the time of the day.
+
+Properties of type \c date default to an invalid value.
+
+To create a \c date value, specify it as a "YYYY-MM-DDThh:mm:ss.zzzZ" string.
+(The T is literal, YYYY is a full year number, MM and DD are month and day
+numbers, hh, mm and ss are hours, minutes and seconds, with .zzz as
+milliseconds and Z as time-zone offset. The T and following time are optional.
+If they are omitted, the date is handled as the start of UTC's day, which
+falls on other dates in some time-zones. When T is included, the :ss.zzz or
+just .zzz part can be omitted. With or without those, the zone offset can be
+omitted, in which case local time is used.) For example:
+
+\qml
+MyDatePicker { minDate: "2000-01-01 0:0"; maxDate: "2020-12-31 23:59" }
+\endqml
+
+To read a date value returned from a C++ extension class, use
+\l{QtQml::Qt::formatDate()}{Qt.formatDate()} and \l{QtQml::Qt::formatDateTime()}{Qt.formatDateTime()}.
+
+When integrating with C++, note that any QDate or QDateTime value
+\l{qtqml-cppintegration-data.html}{passed into QML from C++} is automatically
+converted into a \c date value, and vice-versa. Note, however, that
+converting a QDate will result in UTC's start of the day, which falls on
+a different date in some other time-zones. It is usually more robust
+to convert the QDate via a QDateTime explicitly, specifying local-time
+or a relevant time-zone and selecting a time of day (such as noon)
+that reliably exists (daylight-savings transitions skip an hour, near
+one end or the other of a day).
+
+This value type is provided by the QML language. It can be implicitly converted
+to a \l{QtQml::Date}{Date} object.
+
+\sa {QtQml::Date}{QML Date object}, {QML Value Types}
+*/
+
+/*!
+\qmlvaluetype point
+\ingroup qtqmlvaluetypes
+\ingroup qtquickvaluetypes
+\brief a value with x and y attributes.
+
+The \c point type refers to a value with \c x and \c y attributes.
+
+To create a \c point value, specify it as a "x,y" string:
+
+\qml
+CustomObject { myPointProperty: "0,20" }
+\endqml
+
+Or use the \l{QtQml::Qt::point()}{Qt.point()} function:
+
+\qml
+CustomObject { myPointProperty: Qt.point(0, 20) }
+\endqml
+
+When integrating with C++, note that any QPoint or QPointF value
+\l{qtqml-cppintegration-data.html}{passed into QML from C++} is automatically
+converted into a \c point value. When a \c point value is passed to C++, it
+is automatically converted into a QPointF value.
+
+Properties of type \c point are \c {Qt.point(0, 0)} by default.
+
+\sa{QML Value Types}
+*/
+
+/*!
+\qmlvaluetype size
+\ingroup qtqmlvaluetypes
+\ingroup qtquickvaluetypes
+\brief a value with width and height attributes.
+
+The \c size type refers to a value with has \c width and \c height attributes.
+
+Properties of type \c size have \c {Qt.size(-1, -1)} as default value.
+
+For example, to read the \c width and \c height values of the
+\l {Image::sourceSize} size-type property:
+
+\qml
+Column {
+    Image { id: image; source: "logo.png" }
+    Text { text: image.sourceSize.width + "," + image.sourceSize.height }
+}
+\endqml
+
+To create a \c size value, specify it as a "width x height" string:
+
+\qml
+Image { sourceSize: "150x50" }
+\endqml
+
+Or use the \l{QtQml::Qt::size()}{Qt.size()} function:
+
+\qml
+Image { sourceSize: Qt.size(150, 50) }
+\endqml
+
+When integrating with C++, note that any QSize or QSizeF value
+\l{qtqml-cppintegration-data.html}{passed into QML from C++} is automatically
+converted into a \c size value, and vice-versa. When a \c size value is passed to C++, it
+is automatically converted into a QSizeF value.
+
+\sa{QML Value Types}
+*/
+
+/*!
+\qmlvaluetype rect
+\ingroup qtqmlvaluetypes
+\ingroup qtquickvaluetypes
+\brief a value with x, y, width and height attributes.
+
+The \c rect type refers to a value with \c x, \c y, \c width and \c height attributes.
+
+Properties of type \c rect are \c {Qt.rect(0, 0, 0, 0)} by default. This is an
+empty rectangle at the coordinate origin.
+
+For example, to read the \c width and \c height values of the \l Item
+\l {Item::childrenRect.x}{childrenRect} rect-type property:
+
+\qml
+Rectangle {
+    width: childrenRect.width
+    height: childrenRect.height
+
+    Rectangle { width: 100; height: 100 }
+}
+\endqml
+
+To create a \c rect value, specify it as a "x, y, width x height" string:
+
+\qml
+CustomObject { myRectProperty: "50,50,100x100" }
+\endqml
+
+Or use the \l{QtQml::Qt::rect()}{Qt.rect()} function:
+
+\qml
+CustomObject { myRectProperty: Qt.rect(50, 50, 100, 100) }
+\endqml
+
+The \c rect type also exposes read-only \c left, \c right, \c top and \c bottom
+attributes. These are the same as their \l {QRectF}{C++ counterparts}.
+
+When integrating with C++, note that any QRect or QRectF value
+\l{qtqml-cppintegration-data.html}{passed into QML from C++} is automatically
+converted into a \c rect value, and vice-versa. When a \c rect value is passed to C++, it
+is automatically converted into a QRectF value.
+
+\sa{QML Value Types}
+*/

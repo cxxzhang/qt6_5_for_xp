@@ -1,0 +1,19 @@
+Makefile*
+*.pdb
+*.exe
+*.dll
+*.ilk
+*.obj
+*.lib
+*.res
+*.exp
+*.manifest
+*_resource.rc
+moc_*.cpp
+*.moc
+.qmake.cache
+config.log
+tmp
+
+# Generated static plugin import sources
+*_plugin_import.cpp

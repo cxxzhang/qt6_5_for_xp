@@ -1,0 +1,28 @@
+[touchAndDragHandlerOnFlickable]
+windows gcc
+opensuse-leap
+[touchDragFlickableBehindSlider]
+windows gcc
+[touchDragFlickableBehindButton]
+windows gcc
+[touchDragSliderAndFlickable]
+* # QTBUG-86729
+# QTBUG-95887
+[mouseDragSlider]
+opensuse-leap
+# QTBUG-95887
+[touchDragFlickableBehindButton]
+opensuse-leap
+# QTBUG-95887
+[mouseClickButton]
+opensuse-leap
+# QTBUG-95887
+[mouseDragFlickableBehindSlider]
+opensuse-leap
+# QTBUG-103061
+[touchDragFlickableBehindItemWithHandlers]
+android
+[mouseDragFlickableBehindItemWithHandlers]
+android
+[touchAndDragHandlerOnFlickable]
+android

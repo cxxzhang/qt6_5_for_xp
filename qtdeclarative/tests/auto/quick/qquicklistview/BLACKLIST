@@ -1,0 +1,15 @@
+[enforceRange_withoutHighlight]
+opensuse-42.3
+opensuse-leap
+#QTBUG-53863
+[populateTransitions]
+opensuse-42.1
+# QTBUG-75202
+[contentHeightWithDelayRemove]
+macos ci
+
+# QTBUG-103089
+[QTBUG_48044_currentItemNotVisibleAfterTransition]
+android
+[contentHeightWithDelayRemove]
+android

@@ -1,0 +1,12 @@
+include(../configs/testqml.qdocconf)
+
+project = QmlPropertyGroups
+url = https://doc.qt.io/${project}
+
+sourcedirs += .
+
+outputformats = HTML DocBook
+
+{HTML.nosubdirs,DocBook.nosubdirs}  = true
+HTML.outputsubdir                   = qmlpropertygroups
+DocBook.outputsubdir                = qmlpropertygroups-docbook

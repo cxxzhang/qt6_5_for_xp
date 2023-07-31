@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/scenegraph/fboitem">
+        <file>main.qml</file>
+        <file>shaders/checker.frag.qsb</file>
+    </qresource>
+</RCC>

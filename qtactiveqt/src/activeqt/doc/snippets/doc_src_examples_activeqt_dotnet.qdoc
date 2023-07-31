@@ -1,0 +1,7 @@
+// Copyright (C) 2015 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+
+//! [0]
+' VB is case insensitive, but our C++ controls are not.
+' Me.resetButton.enabled = True
+//! [0]

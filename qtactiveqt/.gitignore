@@ -1,0 +1,88 @@
+# This file is used to ignore files which are generated in the Qt build system
+# ----------------------------------------------------------------------------
+
+examples/*/*/*
+!examples/*/*/*[.]*
+!examples/*/*/README
+examples/*/*/*[.]app
+
+pcviewer.cfg
+*~
+*.a
+*.la
+*.core
+*.moc
+*.obj
+*.orig
+*.swp
+*.rej
+*.mode1
+*.mode1v3
+*_pch.h.cpp
+*_resource.rc
+.#*
+*.*#
+.qmake.cache
+.qmake.vars
+tags
+*.debug
+Makefile*
+*.prl
+*.pro.user
+*.qmlproject.user
+*.gcov
+moc_*.cpp
+ui_*.h
+tools/testcon/testcon.tlb
+qrc_*.cpp
+*_wrapper.bat
+
+# Test generated files
+QObject.log
+tst_*
+!tst_*.*
+tst_*.log
+tst_*.debug
+tst_*~
+
+# xemacs temporary files
+*.flc
+
+# Vim temporary files
+.*.swp
+
+# Visual Studio generated files
+*.ib_pdb_index
+*.idb
+*.ilk
+*.pdb
+*.sln
+*.suo
+*.vcproj
+*vcproj.*.*.user
+*.ncb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# MinGW generated files
+*.Debug
+*.Release
+
+.DS_Store
+.pch
+.rcc
+*.app
+
+# Directories to ignore
+# ---------------------
+
+debug
+release
+tmp
+.rcc
+.pch
+.metadata
+
+# Generated static plugin import sources
+*_plugin_import.cpp

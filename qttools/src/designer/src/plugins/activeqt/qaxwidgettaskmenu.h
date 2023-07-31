@@ -1,0 +1,38 @@
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only WITH Qt-GPL-exception-1.0
+
+#ifndef QACTIVEXTASKMENU_H
+#define QACTIVEXTASKMENU_H
+
+#include <QtDesigner/taskmenu.h>
+#include <QtDesigner/private/extensionfactory_p.h>
+
+QT_BEGIN_NAMESPACE
+
+class QDesignerAxWidget;
+
+class QAxWidgetTaskMenu: public QObject, public QDesignerTaskMenuExtension
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerTaskMenuExtension)
+public:
+    explicit QAxWidgetTaskMenu(QDesignerAxWidget *object, QObject *parent = nullptr);
+    virtual ~QAxWidgetTaskMenu();
+    QList<QAction*> taskActions() const override;
+
+private slots:
+    void setActiveXControl();
+    void resetActiveXControl();
+
+private:
+    QDesignerAxWidget *m_axwidget;
+    QAction *m_setAction;
+    QAction *m_resetAction;
+    QList<QAction*> m_taskActions;
+};
+
+typedef qdesigner_internal::ExtensionFactory<QDesignerTaskMenuExtension, QDesignerAxWidget, QAxWidgetTaskMenu>  ActiveXTaskMenuFactory;
+
+QT_END_NAMESPACE
+
+#endif // QACTIVEXTASKMENU

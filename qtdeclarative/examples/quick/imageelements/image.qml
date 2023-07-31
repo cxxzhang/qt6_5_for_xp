@@ -1,0 +1,50 @@
+// Copyright (C) 2021 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+
+import QtQuick
+
+Rectangle {
+    width: 320
+    height: 480
+    Grid {
+        property int cellWidth: (width - (spacing * (columns - 1))) / columns
+        property int cellHeight: (height - (spacing * (rows - 1))) / rows
+
+        anchors.fill: parent
+        anchors.margins: 30
+
+        columns: 2
+        rows: 3
+        spacing: 30
+
+        component SizedImageCell: ImageCell {
+            width: parent.cellWidth
+            height: parent.cellHeight
+        }
+
+        SizedImageCell {
+            mode: Image.Stretch
+            caption: "Stretch"
+        }
+        SizedImageCell {
+            mode: Image.PreserveAspectFit
+            caption: "PreserveAspectFit"
+        }
+        SizedImageCell {
+            mode: Image.PreserveAspectCrop
+            caption: "PreserveAspectCrop"
+        }
+        SizedImageCell {
+            mode: Image.Tile
+            caption: "Tile"
+        }
+        SizedImageCell {
+            mode: Image.TileHorizontally
+            caption: "TileHorizontally"
+        }
+        SizedImageCell {
+            mode: Image.TileVertically
+            caption: "TileVertically"
+        }
+    }
+}

@@ -1,0 +1,39 @@
+# QTBUG-78162
+[mouseSelectionMode]
+opensuse-leap
+
+# QTBUG-99150
+[copyAndPaste]
+opensuse-leap
+
+# QTBUG-99150
+[canPaste]
+opensuse-leap
+
+# QTBUG-82058
+[setInputMask]
+macos ci
+
+# QTQAINFRA-4127
+[passwordCharacter]
+ci b2qt 32bit
+
+# QTBUG-95940
+[canPaste]
+opensuse-leap
+
+# QTBUG-95940
+[canPasteEmpty]
+opensuse-leap
+
+# QTBUG-95940
+[copyAndPaste]
+opensuse-leap
+
+# QTBUG-95940
+[copyAndPasteKeySequence]
+opensuse-leap
+
+# QTBUG-103256
+[copyAndPasteKeySequence]
+android

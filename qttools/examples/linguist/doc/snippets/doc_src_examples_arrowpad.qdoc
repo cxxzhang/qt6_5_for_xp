@@ -1,0 +1,21 @@
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+
+//! [0]
+lupdate arrowpad.pro
+//! [0]
+
+//! [1]
+lrelease arrowpad.pro
+//! [1]
+
+
+//! [2]
+export LANG=fr
+setenv LANG fr
+//! [2]
+
+
+//! [4]
+cmake --build . --target update_translations
+//! [4]

@@ -1,0 +1,22 @@
+# build system & qt creator
+Makefile*
+*_wrapper.sh
+*_wrapper.bat
+*.pro.user
+/.qmake.cache
+/config.status
+
+# actually translation related
+/translations/*_en.ts
+/translations/*_untranslated.ts
+*.qm
+
+# general stuff
+tags
+.DS_Store
+
+# xemacs temporary files
+*.flc
+
+# Vim temporary files
+.*.swp

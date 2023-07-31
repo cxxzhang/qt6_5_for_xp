@@ -1,0 +1,286 @@
+// Copyright (C) 2019 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+
+#ifndef QQUICKFLICKABLE_P_P_H
+#define QQUICKFLICKABLE_P_P_H
+
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+//
+
+#include "qquickflickable_p.h"
+#include "qquickitem_p.h"
+#include "qquickitemchangelistener_p.h"
+
+#include <QtQml/qqml.h>
+#include <QtCore/qdatetime.h>
+#include "qplatformdefs.h"
+
+#include <private/qquicktimeline_p_p.h>
+#include <private/qquickanimation_p_p.h>
+#include <private/qquicktransitionmanager_p_p.h>
+#include <private/qpodvector_p.h>
+
+QT_BEGIN_NAMESPACE
+
+class QQuickFlickableVisibleArea;
+class QQuickTransition;
+class QQuickFlickableReboundTransition;
+
+class Q_QUICK_PRIVATE_EXPORT QQuickFlickablePrivate : public QQuickItemPrivate, public QQuickItemChangeListener
+{
+    Q_DECLARE_PUBLIC(QQuickFlickable)
+
+public:
+    static inline QQuickFlickablePrivate *get(QQuickFlickable *o) { return o->d_func(); }
+
+    QQuickFlickablePrivate();
+    void init();
+
+    struct Velocity : public QQuickTimeLineValue
+    {
+        Velocity(QQuickFlickablePrivate *p)
+            : parent(p) {}
+        void setValue(qreal v) override {
+            if (v != value()) {
+                QQuickTimeLineValue::setValue(v);
+                parent->updateVelocity();
+            }
+        }
+        QQuickFlickablePrivate *parent;
+    };
+
+    struct AxisData {
+        AxisData(QQuickFlickablePrivate *fp, void (QQuickFlickablePrivate::*func)(qreal))
+            : move(fp, func)
+            , transitionToBounds(nullptr)
+            , viewSize(-1), lastPos(0), previousDragDelta(0), velocity(0), startMargin(0), endMargin(0)
+            , origin(0), overshoot(0)
+            , transitionTo(0)
+            , continuousFlickVelocity(0), velocityTime(), vTime(0)
+            , smoothVelocity(fp), atEnd(false), atBeginning(true)
+            , transitionToSet(false)
+            , fixingUp(false), inOvershoot(false), inRebound(false), moving(false), flicking(false)
+            , flickingWhenDragBegan(false), dragging(false), extentsChanged(false)
+            , explicitValue(false), minExtentDirty(true), maxExtentDirty(true)
+            , contentPositionChangedExternallyDuringDrag(false)
+            , unused(0)
+        {}
+
+        ~AxisData();
+
+        void reset() {
+            velocityBuffer.clear();
+            dragStartOffset = 0;
+            fixingUp = false;
+            inOvershoot = false;
+            contentPositionChangedExternallyDuringDrag = false;
+        }
+
+        void markExtentsDirty() {
+            minExtentDirty = true;
+            maxExtentDirty = true;
+            extentsChanged = true;
+        }
+
+        void resetTransitionTo() {
+            transitionTo = 0;
+            transitionToSet = false;
+        }
+
+        void addVelocitySample(qreal v, qreal maxVelocity);
+        void updateVelocity();
+
+        QQuickTimeLineValueProxy<QQuickFlickablePrivate> move;
+        QQuickFlickableReboundTransition *transitionToBounds;
+        qreal viewSize;
+        qreal pressPos;
+        qreal lastPos;
+        qreal dragStartOffset;
+        qreal dragMinBound;
+        qreal dragMaxBound;
+        qreal previousDragDelta;
+        qreal velocity;
+        qreal flickTarget;
+        qreal startMargin;
+        qreal endMargin;
+        qreal origin;
+        qreal overshoot;
+        qreal transitionTo;
+        qreal continuousFlickVelocity;
+        QElapsedTimer velocityTime;
+        int vTime;
+        QQuickFlickablePrivate::Velocity smoothVelocity;
+        QPODVector<qreal,10> velocityBuffer;
+        uint atEnd : 1;
+        uint atBeginning : 1;
+        uint transitionToSet : 1;
+        uint fixingUp : 1;
+        uint inOvershoot : 1;
+        uint inRebound : 1;
+        uint moving : 1;
+        uint flicking : 1;
+        uint flickingWhenDragBegan : 1;
+        uint dragging : 1;
+        uint extentsChanged : 1;
+        uint explicitValue : 1;
+        mutable uint minExtentDirty : 1;
+        mutable uint maxExtentDirty : 1;
+        uint contentPositionChangedExternallyDuringDrag : 1;
+        uint unused : 17;
+    };
+
+    bool flickX(qreal velocity);
+    bool flickY(qreal velocity);
+    virtual bool flick(AxisData &data, qreal minExtent, qreal maxExtent, qreal vSize,
+                        QQuickTimeLineCallback::Callback fixupCallback, qreal velocity);
+    void flickingStarted(bool flickingH, bool flickingV);
+
+    void fixupX();
+    void fixupY();
+    virtual void fixup(AxisData &data, qreal minExtent, qreal maxExtent);
+    void adjustContentPos(AxisData &data, qreal toPos);
+    void resetTimeline(AxisData &data);
+    void clearTimeline();
+
+    void updateBeginningEnd();
+
+    bool isInnermostPressDelay(QQuickItem *item) const;
+    void captureDelayedPress(QQuickItem *item, QPointerEvent *event);
+    void clearDelayedPress();
+    void replayDelayedPress();
+
+    void setViewportX(qreal x);
+    void setViewportY(qreal y);
+
+    qreal overShootDistance(qreal velocity) const;
+
+    void itemGeometryChanged(QQuickItem *, QQuickGeometryChange, const QRectF &) override;
+
+    void draggingStarting();
+    void draggingEnding();
+
+    bool isViewMoving() const;
+
+    void cancelInteraction();
+
+    void addPointerHandler(QQuickPointerHandler *h) override;
+
+    virtual bool wantsPointerEvent(const QPointerEvent *) { return true; }
+
+public:
+    QQuickItem *contentItem;
+
+    AxisData hData;
+    AxisData vData;
+
+    QQuickTimeLine timeline;
+    bool hMoved : 1;
+    bool vMoved : 1;
+    bool stealMouse : 1;
+    bool pressed : 1;
+    bool scrollingPhase : 1;
+    bool interactive : 1;
+    bool calcVelocity : 1;
+    bool pixelAligned : 1;
+    bool syncDrag : 1;
+    QElapsedTimer timer;
+    qint64 lastPosTime;
+    qint64 lastPressTime;
+    QPointF lastPos;
+    QPointF pressPos;
+    QVector2D accumulatedWheelPixelDelta;
+    qreal deceleration;
+    qreal maxVelocity;
+    QPointerEvent *delayedPressEvent;
+    QBasicTimer delayedPressTimer;
+    int pressDelay;
+    int fixupDuration;
+    qreal flickBoost;
+    qreal initialWheelFlickDistance;
+
+    enum FixupMode { Normal, Immediate, ExtentChanged };
+    FixupMode fixupMode;
+
+    static void fixupY_callback(void *);
+    static void fixupX_callback(void *);
+
+    void updateVelocity();
+    int vTime;
+    QQuickTimeLine velocityTimeline;
+    QQuickFlickableVisibleArea *visibleArea;
+    QQuickFlickable::FlickableDirection flickableDirection;
+    QQuickFlickable::BoundsBehavior boundsBehavior;
+    QQuickFlickable::BoundsMovement boundsMovement;
+    QQuickTransition *rebound;
+
+    void viewportAxisMoved(AxisData &data, qreal minExtent, qreal maxExtent,
+                       QQuickTimeLineCallback::Callback fixupCallback);
+
+    void handlePressEvent(QPointerEvent *);
+    void handleMoveEvent(QPointerEvent *);
+    void handleReleaseEvent(QPointerEvent *);
+
+    void maybeBeginDrag(qint64 currentTimestamp, const QPointF &pressPosn);
+    void drag(qint64 currentTimestamp, QEvent::Type eventType, const QPointF &localPos,
+              const QVector2D &deltas, bool overThreshold, bool momentum,
+              bool velocitySensitiveOverBounds, const QVector2D &velocity);
+
+    QVector2D firstPointLocalVelocity(QPointerEvent *event);
+    qint64 computeCurrentTime(QInputEvent *event) const;
+    qreal devicePixelRatio() const;
+
+    // flickableData property
+    static void data_append(QQmlListProperty<QObject> *, QObject *);
+    static qsizetype data_count(QQmlListProperty<QObject> *);
+    static QObject *data_at(QQmlListProperty<QObject> *, qsizetype);
+    static void data_clear(QQmlListProperty<QObject> *);
+};
+
+class Q_QUICK_PRIVATE_EXPORT QQuickFlickableVisibleArea : public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(qreal xPosition READ xPosition NOTIFY xPositionChanged)
+    Q_PROPERTY(qreal yPosition READ yPosition NOTIFY yPositionChanged)
+    Q_PROPERTY(qreal widthRatio READ widthRatio NOTIFY widthRatioChanged)
+    Q_PROPERTY(qreal heightRatio READ heightRatio NOTIFY heightRatioChanged)
+    QML_ANONYMOUS
+    QML_ADDED_IN_VERSION(2, 0)
+
+public:
+    QQuickFlickableVisibleArea(QQuickFlickable *parent=nullptr);
+
+    qreal xPosition() const;
+    qreal widthRatio() const;
+    qreal yPosition() const;
+    qreal heightRatio() const;
+
+    void updateVisible();
+
+Q_SIGNALS:
+    void xPositionChanged(qreal xPosition);
+    void yPositionChanged(qreal yPosition);
+    void widthRatioChanged(qreal widthRatio);
+    void heightRatioChanged(qreal heightRatio);
+
+private:
+    QQuickFlickable *flickable;
+    qreal m_xPosition;
+    qreal m_widthRatio;
+    qreal m_yPosition;
+    qreal m_heightRatio;
+};
+
+QT_END_NAMESPACE
+
+QML_DECLARE_TYPE(QQuickFlickableVisibleArea)
+
+#endif // QQUICKFLICKABLE_P_P_H

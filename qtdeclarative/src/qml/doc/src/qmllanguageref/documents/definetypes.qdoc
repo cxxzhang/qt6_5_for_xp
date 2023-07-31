@@ -1,0 +1,387 @@
+// Copyright (C) 2017 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
+/*!
+\page qtqml-documents-definetypes.html
+\title Defining Object Types through QML Documents
+\brief Description of how a QML document is a reusable type definition
+
+One of the core features of QML is that it enables QML object types to be
+easily defined in a lightweight manner through QML documents to suit the needs
+of individual QML applications. The standard \l {Qt Quick} module provides
+various types like \l Rectangle, \l Text and \l Image for building a QML
+application; beyond these, you can easily define your own QML types to be
+reused within your application. This ability to create your own types forms the
+building blocks of any QML application.
+
+
+\section1 Defining an Object Type with a QML File
+
+\section2 Naming Custom QML Object Types
+
+To create an object type, a QML document should be placed into a text file
+named as \e <TypeName>.qml where \e <TypeName> is the desired name of the type.
+The type name has the following requirements:
+
+\list
+    \li It must be comprised of alphanumeric characters or underscores.
+    \li It must begin with an uppercase letter.
+\endlist
+
+This document is then automatically recognized by the engine as a definition of
+a QML type. Additionally, a type defined in this manner is automatically made
+available to other QML files within the same local directory as the engine
+searches within the immediate directory when resolving QML type names.
+
+\note The QML engine does not automatically search remote directories this way.
+You have to add a qmldir file if your documents are loaded over the network. See
+\l{Importing QML Document Directories}.
+
+\section2 Custom QML Type Definition
+
+For example, below is a document that declares a \l Rectangle with a child \l
+MouseArea. The document has been saved to file named \c SquareButton.qml:
+
+\qml
+// SquareButton.qml
+import QtQuick 2.0
+
+Rectangle {
+    property int side: 100
+    width: side; height: side
+    color: "red"
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: console.log("Button clicked!")
+    }
+}
+\endqml
+
+Since the file is named \c SquareButton.qml, \b {this can now be used as a type
+named \c SquareButton by any other QML file within the same directory}. For
+example, if there was a \c myapplication.qml file in the same directory, it
+could refer to the \c SquareButton type:
+
+\qml
+// myapplication.qml
+import QtQuick 2.0
+
+SquareButton {}
+\endqml
+
+\image documents-definetypes-simple.png
+
+This creates a 100 x 100 red \l Rectangle with an inner \l MouseArea, as
+defined in \c SquareButton.qml. When this \c myapplication.qml document is
+loaded by the engine, it loads the SquareButton.qml document as a component and
+instantiates it to create a \c SquareButton object.
+
+The \c SquareButton type encapsulates the tree of QML objects declared in \c
+SquareButton.qml. When the QML engine instantiates a \c SquareButton object
+from this type, it is instantiating an object from the \l Rectangle tree
+declared in \c SquareButton.qml.
+
+\note the letter case of the file name is significant on some (notably UNIX)
+filesystems. It is recommended the file name case matches the case of the
+desired QML type name exactly - for example, \c Box.qml and not \c BoX.qml -
+regardless of the platform to which the QML type will be deployed.
+
+\section2 Inline Components
+
+Sometimes, it can be inconvenient to create  a new file for a type, for
+instance when reusing a small delegate in multiple views. If you don't actually
+need to expose the type, but only need to create an instance,
+\l{QtQml::Component}{Component} is an option.
+But if you want to declare properties with the component types, or if you
+want to use it in multiple files, \c Component is not an option. In that case,
+you can use \e {inline components}. Inline components declare a new component
+inside of a file. The syntax for that is
+\code
+component <component name> : BaseType {
+    // declare properties and bindings here
+}
+\endcode
+
+Inside the file which declares the inline component, the type can be referenced
+simply by its name.
+
+\snippet qml/qml-documents/Images.qml document
+
+In other files, it has to be prefixed with the name of its containing component.
+
+\snippet qml/qml-documents/LabeledImageBox.qml document
+
+\note Inline components don't share their scope with the component they are
+declared in. In the following example, when \c A.MyInlineComponent in file
+B.qml gets created, a ReferenceError will occur, as \c root does not exist as
+an id in B.qml.
+It is therefore advisable not to reference objects in an inline component
+which are not part of it.
+
+\snippet qml/qml-documents/A.qml document
+\snippet qml/qml-documents/B.qml document
+
+\note Inline components cannot be nested.
+
+\section2 Importing Types Defined Outside the Current Directory
+
+If \c SquareButton.qml was not in the same directory as \c myapplication.qml,
+the \c SquareButton type would need to be specifically made available through
+an \e import statement in \c myapplication.qml. It could be imported from a
+relative path on the file system, or as an installed module; see \l {QML
+Modules}{module} for more details.
+
+
+\section1 Accessible Attributes of Custom Types
+
+The \b {root object} definition in a .qml file \b {defines the attributes that
+are available for a QML type}. All properties, signals and methods that belong
+to this root object - whether they are custom declared, or come from the QML
+type of the root object - are externally accessible and can be read and
+modified for objects of this type.
+
+For example, the root object type in the \c SquareButton.qml file above is \l
+Rectangle. This means any properties defined by the \l Rectangle type can be
+modified for a \c SquareButton object. The code below defines three \c
+SquareButton objects with customized values for some of the properties of the
+root \l Rectangle object of the \c SquareButton type:
+
+\qml
+// application.qml
+import QtQuick 2.0
+
+Column {
+    SquareButton { side: 50 }
+    SquareButton { x: 50; color: "blue" }
+    SquareButton { radius: 10 }
+}
+\endqml
+
+\image documents-definetypes-attributes.png
+
+The attributes that are accessible to objects of the custom QML type include
+any \l{Defining Property Attributes}{custom properties}, \l{Defining Method
+Attributes}{methods} and \l{Defining Signal Attributes}{signals} that have
+additionally been defined for an object. For example, suppose the \l Rectangle
+in \c SquareButton.qml had been defined as follows, with additional properties,
+methods and signals:
+
+\qml
+// SquareButton.qml
+import QtQuick 2.0
+
+Rectangle {
+    id: root
+
+    property bool pressed: mouseArea.pressed
+
+    signal buttonClicked(real xPos, real yPos)
+
+    function randomizeColor() {
+        root.color = Qt.rgba(Math.random(), Math.random(), Math.random(), 1)
+    }
+
+    property int side: 100
+    width: side; height: side
+    color: "red"
+
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        onClicked: (mouse)=> root.buttonClicked(mouse.x, mouse.y)
+    }
+}
+\endqml
+
+Any \c SquareButton object could make use of the \c pressed property, \c
+buttonClicked signal and \c randomizeColor() method that have been added to the
+root \l Rectangle:
+
+\qml
+// application.qml
+import QtQuick 2.0
+
+SquareButton {
+    id: squareButton
+
+    onButtonClicked: (xPos, yPos)=> {
+        console.log("Clicked", xPos, yPos)
+        randomizeColor()
+    }
+
+    Text { text: squareButton.pressed ? "Down" : "Up" }
+}
+\endqml
+
+Note that any of the \c id values defined in \c SquareButton.qml are not
+accessible to \c SquareButton objects, as id values are only accessible from
+within the component scope in which a component is declared. The \c
+SquareButton object definition above cannot refer to \c mouseArea in order to
+refer to the \l MouseArea child, and if it had an \c id of \c root rather than
+\c squareButton, this would not conflict with the \c id of the same value for
+the root object defined in \c SquareButton.qml as the two would be declared
+within separate scopes.
+
+\section1 Pragmas
+
+You can prepend global instructions to a QML document using the \c pragma
+keyword. The following pragmas are supported:
+
+\section2 Singleton
+
+\c{pragma Singleton} declares the component defined in the QML document as
+singleton. Singletons are created only once per QML engine. In order to use
+a QML-declared singleton you also have to register it with its module. See
+\l{qt_target_qml_sources} for how to do this with CMake.
+
+\section2 ListPropertyAssignBehavior
+
+With this pragma you can define how assignments to list properties shall be
+handled in components defined in the QML document. By default, assigning to a
+list property appends to the list. You can explicitly request this behavior
+using the value \c{Append}. Alternatively, you can request the contents of list
+properties to always be replaced using \c{Replace}, or replaced if the property
+is not the default property using \c{ReplaceIfNotDefault}. For example:
+
+\qml
+pragma ListPropertyAssignBehavior: ReplaceIfNotDefault
+\endqml
+
+The same declaration can also be given for C++-defined types. See
+\l{QML_LIST_PROPERTY_ASSIGN_BEHAVIOR_APPEND},
+\l{QML_LIST_PROPERTY_ASSIGN_BEHAVIOR_REPLACE}, and
+\l{QML_LIST_PROPERTY_ASSIGN_BEHAVIOR_REPLACE_IF_NOT_DEFAULT}
+
+\section2 ComponentBehavior
+
+With this pragma you can restrict components defined in this file to only
+create objects within their original context. This holds for inline
+components as well as Component elements explicitly or implicitly created
+as properties. If a component is bound to its context, you can safely
+use IDs from the rest of the file within the component. Otherwise, the
+engine and the QML tooling cannot know in advance what type, if any, such
+IDs will resolve to at run time.
+
+In order to bind the components to their context specify the \c{Bound}
+argument:
+
+\qml
+pragma ComponentBehavior: Bound
+\endqml
+
+The default is \c{Unbound}. You can also specify it explicitly. In a
+future version of Qt the default will change to \c{Bound}.
+
+Delegate components bound to their context don't receive their own
+private contexts on instantiation. This means that model data can only
+be passed via \l{Required Properties}{required properties} in this case.
+Passing model data via context properties will not work. This concerns
+delegates to e.g. \l{Instantiator}, \l{Repeater}, \l{ListView},
+\l{TableView}, \l{GridView}, \l{TreeView} and in general anything that
+uses \l{DelegateModel} internally.
+
+For example, the following will \e{not} work:
+
+\qml
+pragma ComponentBehavior: Bound
+import QtQuick
+
+ListView {
+    delegate: Rectangle {
+        color: model.myColor
+    }
+}
+\endqml
+
+The \c{delegate} property of \l{ListView} is a component. Therefore, a
+\l{Component} is implicitly created around the \l{Rectangle} here. That
+component is bound to its context. It doesn't receive the context property
+\c{model} provided by \l{ListView}. To make it work, you'd have to write
+it this way:
+
+\qml
+pragma ComponentBehavior: Bound
+import QtQuick
+
+ListView {
+    delegate: Rectangle {
+        required property color myColor
+        color: myColor
+    }
+}
+\endqml
+
+You can nest components in a QML file. The pragma holds for all components in
+the file, no matter how deeply nested.
+
+
+\section2 FunctionSignatureBehavior
+
+With this pragma you can change the way type annotations on functions are
+handled. By default the interpreter and JIT ignore type annotations, but
+the \l{QML Script Compiler} enforces them when compiling to C++.
+
+Specifying \c{Enforce} as value makes sure the type annotations are always
+enforced. The resulting type coercions increase the overhead of calling
+typed JavaScript functions.
+
+Specifying \c{Ignore} as value makes the \l{QML Script Compiler} ignore
+any JavaScript functions when compiling the document to C++. This means less
+code is compiled to C++ ahead of time, and more code has to be interpreted or
+JIT-compiled.
+
+\sa {Type annotations and assertions}
+
+\section2 ValueTypeBehavior
+
+The behavior of \l{QML Value Types} and list types differs slightly
+depending on whether a QML document is compiled to C++ using the
+\l{QML Script Compiler} or interpreted at run time.
+
+With this pragma you can change the way value types and sequences are handled
+when retrieved as locals from properties. By default, the interpreter and JIT
+treat all value types and sequences as references. This means, if you change
+the local value, the original property is also changed. Furthermore, if you
+write the original property explicitly, the local value is also updated.
+
+When compiled to C++ using the \l{QML Script Compiler}, the local value is not
+updated when the property is written, and the property is only updated when
+written directly, without retrieving it as local value before.
+
+For example, the following code prints "1 1" when compiled to C++ and "5 5"
+when interpreted or JIT-compiled:
+
+\qml
+import QtQml
+
+QtObject {
+    id: root
+
+    property rect r: ({x: 1, y: 2, width: 3, height: 4})
+    property list<double> numbers: [1, 2, 3, 4, 5]
+
+    function manipulate() {
+        root.r = {x: 5, y: 6, width: 7, height: 8};
+        root.numbers = [5, 4, 3, 2, 1];
+    }
+
+    Component.onCompleted: {
+        var numbers = root.numbers;
+        var r = root.r;
+        manipulate()
+        console.log(r.x, numbers[0]);
+    }
+}
+\endqml
+
+You may notice that the behavior when interpreted or JIT-compiled can be rather
+confusing.
+
+Specifying \c{Copy} as value to the pragma makes the interpreter and JIT behave
+like the generated C++ code. This is the recommended way to handle the problem.
+Specifying \c{Reference} makes the \l{QML Script Compiler} skip any functions
+that use value types or sequences when generating C++ code. Those functions are
+then left to be interpreted or JIT-compiled with the default behavior of the
+interpreter and JIT.
+
+*/

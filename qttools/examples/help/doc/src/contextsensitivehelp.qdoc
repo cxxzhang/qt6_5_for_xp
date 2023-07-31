@@ -1,0 +1,11 @@
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
+
+/*!
+    \example contextsensitivehelp
+    \ingroup examples-qthelp
+    \title Context-Sensitive Help Example
+
+    \brief Using the QHelpEngineCore class to implement context-sensitive help
+    for applications.
+*/

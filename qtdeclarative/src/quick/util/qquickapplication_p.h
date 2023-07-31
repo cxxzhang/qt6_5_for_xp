@@ -1,0 +1,79 @@
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+
+#ifndef QQUICKAPPLICATION_P_H
+#define QQUICKAPPLICATION_P_H
+
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+//
+
+#include <QtQuick/private/qtquickglobal_p.h>
+#include <QtQuick/private/qquickscreen_p.h>
+
+#include <QtQml/qqml.h>
+#include <QtQml/private/qqmlglobal_p.h>
+
+#include <QtGui/qfont.h>
+#include <QtGui/qstylehints.h>
+
+#include <QtCore/qobject.h>
+
+QT_BEGIN_NAMESPACE
+
+class Q_QUICK_PRIVATE_EXPORT QQuickApplication : public QQmlApplication
+{
+    Q_OBJECT
+    Q_PROPERTY(bool active READ active NOTIFY activeChanged) // deprecated, use 'state' instead
+    Q_PROPERTY(Qt::LayoutDirection layoutDirection READ layoutDirection NOTIFY layoutDirectionChanged)
+    Q_PROPERTY(bool supportsMultipleWindows READ supportsMultipleWindows CONSTANT)
+    Q_PROPERTY(Qt::ApplicationState state READ state NOTIFY stateChanged)
+    Q_PROPERTY(QFont font READ font CONSTANT)
+    Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName NOTIFY displayNameChanged)
+    Q_PROPERTY(QQmlListProperty<QQuickScreenInfo> screens READ screens NOTIFY screensChanged)
+    Q_PROPERTY(QStyleHints *styleHints READ styleHints CONSTANT)
+
+    QML_NAMED_ELEMENT(Application)
+    QML_SINGLETON
+    QML_ADDED_IN_VERSION(2, 0)
+
+public:
+    explicit QQuickApplication(QObject *parent = nullptr);
+    virtual ~QQuickApplication();
+    bool active() const;
+    Qt::LayoutDirection layoutDirection() const;
+    bool supportsMultipleWindows() const;
+    Qt::ApplicationState state() const;
+    QFont font() const;
+    QQmlListProperty<QQuickScreenInfo> screens();
+    QString displayName() const;
+    void setDisplayName(const QString &displayName);
+    QStyleHints *styleHints();
+
+Q_SIGNALS:
+    void activeChanged();
+    void displayNameChanged();
+    void layoutDirectionChanged();
+    void stateChanged(Qt::ApplicationState state);
+    void screensChanged();
+
+private Q_SLOTS:
+    void updateScreens();
+
+private:
+    Q_DISABLE_COPY(QQuickApplication)
+    QVector<QQuickScreenInfo *> m_screens;
+};
+
+QT_END_NAMESPACE
+
+QML_DECLARE_TYPE(QQuickApplication)
+
+#endif // QQUICKAPPLICATION_P_H
