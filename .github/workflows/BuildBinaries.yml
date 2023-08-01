@@ -1,0 +1,27 @@
+﻿name: Build Binaries
+
+on: workflow_dispatch
+
+jobs:
+  windows-x86:
+    runs-on: windows-latest
+    env:
+      POWERSHELL_TELEMETRY_OPTOUT: 1
+    steps:
+    - name: Clone repository
+      shell: cmd
+      run: |
+          mkdir C:\Workspaces
+          cd /d C:\Workspaces
+          git clone --recurse-submodules --depth 1 --shallow-submodules --branch main --single-branch --no-tags --progress --verbose https://github.com/cxxzhang/qt6_5_for_xp
+    - name: Build qt6_5_for_xp
+      shell: cmd
+      working-directory: C:\Workspaces\qt6_5_for_xp
+      run: |
+          git config --global user.email "ci@github-actions.com"
+          git config --global user.name "GitHub Actions"
+          call C:\Workspaces\qt6_5_for_xp\onekey-build-x86.bat
+    - uses: actions/upload-artifact@v2
+      with:
+        name: qt6_5_for_xp
+        path: C:\Workspaces\qt6_5_for_xp\Output\Binaries
